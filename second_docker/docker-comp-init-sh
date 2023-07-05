@@ -1,0 +1,24 @@
+!/bin/bash
+
+sudo docker-compose stop
+sudo docker-compose rm
+
+echo "Creating Docker network"
+sudo docker network create --gateway 172.39.0.1 --subnet 172.39.0.2/24 --scope local internal
+
+echo "Creating configuration"
+read -p "`echo -e 'Make a choice: \n 1) Standalone \n 2) Local \n 3) Proxy \n>'`" decision
+if [ "$decision" == "1" ]; then
+    cp Composer/Traefik/.env .env
+    cp Composer/Traefik/docker-compose.yml docker-compose.yml
+fi
+if [ "$decision" == "2" ]; then
+    cp Composer/Local/docker-compose.yml docker-compose.yml
+fi
+if [ "$decision" == "3" ]; then
+    cp Composer/Pisa/.env .env
+    cp Composer/Pisa/docker-compose.yml docker-compose.yml
+fi
+
+echo "Docker-Compose building..."
+sudo docker-compose up --build -d

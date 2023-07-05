@@ -1,0 +1,8 @@
+FROM redis
+
+# COPY CONFIGURATION FILE
+COPY ./netservice/redis.conf /usr/local/etc/redis/redis.conf
+COPY ./netservice/sysctl.conf /etc/sysctl.conf
+
+# REDIS RUN
+CMD [ "redis-server", "/usr/local/etc/redis/redis.conf" ]

@@ -1,0 +1,17 @@
+FROM python:3.8.3-buster
+
+ENV PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100
+
+COPY ./requirements.txt /app/
+ADD ./treetagger.tar.gz /
+WORKDIR /app
+
+RUN pip3 install treetaggerwrapper==2.3
+RUN pip install -r requirements.txt
+RUN python3 -m spacy download en_core_web_sm
+RUN python3 -m nltk.downloader punkt && python3 -m nltk.downloader stopwords

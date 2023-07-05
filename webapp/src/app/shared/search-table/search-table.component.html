@@ -1,0 +1,79 @@
+<ng-container *ngIf="(items | async) && (items | async)!.length > 0; else noData">
+
+    <mat-form-field style="font-size: 12px; margin-bottom: -10px;">
+        <input matInput type="text" (keyup)="doFilter(in.value)" placeholder="Search" autocomplete="off" #in>
+    </mat-form-field>
+
+    <div [ngClass]="class" *ngIf="!hasAction">
+        <table mat-table #dataSort='matSort' [dataSource]="dataSource" matSort [ngClass]="class">
+
+            <ng-container *ngFor="let col of tableColumns; let colIndex = index" matColumnDef="{{col}}">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{tableColumnsNames![colIndex] | titlecase }}</th>
+                <td mat-cell *matCellDef="let element">
+                    <ng-container [ngSwitch]="colIndex">
+                        <ng-container *ngSwitchCase="linkIndex">
+                            <a (click)="clickLink(element.key)" href="javascript:void(0)">{{element[col]}}</a>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="colorIndex">
+                            <div [ngStyle]="{'background-color': element[col] }"
+                                style="border-radius: 100%; height: 20px; width: 20px;"></div>
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                            {{element[col]}}
+                        </ng-container>
+                    </ng-container>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: tableColumns;">
+            </tr>
+        </table>
+    </div>
+
+    <div [ngClass]="class" *ngIf="hasAction">
+        <table mat-table #dataSort='matSort' [dataSource]="dataSource" matSort [ngClass]="class">
+
+            <ng-container matColumnDef="{{tableColumns[0]}}">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{tableColumns[0] | titlecase }}</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element[tableColumns[0]]}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="{{tableColumns[1]}}">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{tableColumns[1] | titlecase }}</th>
+                <td mat-cell *matCellDef="let element; index as i">
+                    <button mat-icon-button color="primary">
+                        <div class="m-icon" (click)="toggleView(element.word)"
+                            [ngStyle]="{ 'background-image': 'url(../../assets/img/' + (element.show ? 'eye' : 'eye-off' ) + '.svg)' }"
+                            style="margin: auto;">
+                        </div>
+                    </button>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="{{tableColumns[2]}}" *ngIf="showFocus">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{tableColumns[2] | titlecase }}</th>
+                <td mat-cell *matCellDef="let element; index as i">
+                    <button mat-icon-button color="primary" [disabled]="!element.show"
+                        (click)="focusView(element.word)">
+                        <mat-icon>zoom_in</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: tableColumns;">
+            </tr>
+        </table>
+    </div>
+
+
+    <mat-paginator *ngIf="hasOptions" [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator>
+    <mat-paginator *ngIf="!hasOptions" showFirstLastButtons></mat-paginator>
+</ng-container>
+
+<ng-template #noData>
+    <div class="no-data" *ngIf="showNoData">No data</div>
+</ng-template>

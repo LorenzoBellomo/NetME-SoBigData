@@ -1,0 +1,10 @@
+{
+    "/posts": {
+        "target": "http://0.0.0.0",
+        "secure": true,
+        "pathRewrite": {
+            "^/posts": ""
+        },
+        "changeOrigin": true
+    }
+}

@@ -1,0 +1,418 @@
+<div class="container p-4 netme page cc-mh" style="min-width: 100% !important; background-color: #fbfbfb !important;">
+
+    <!-- RESPONSE -->
+    <div *ngIf="response" class="response" [@fadeIn]>
+        <mat-card class="mat-elevation-z3 r-left">
+            <div style="display: flex; flex-direction: column;">
+                <div class="param-c">
+                    <p>Node parameters</p>
+                    <div style="display: flex; flex-wrap: wrap; flex: 1;">
+                        <!-- <div class="c-slider">
+                            <p>Min rho: {{minRho / 100.0}}</p>
+                            <mat-slider class="radio-group" [max]="100" [min]="0" [(ngModel)]="minRho"
+                                (ngModelChange)="onChangeMinRho()" [thumbLabel]="true">
+                            </mat-slider>
+                        </div> -->
+                        <div class="c-slider">
+                            <div class="r-slider">
+                                <p>Max items: <b>{{maxItems}}</b></p>
+                                <tt-popup [text]="''"
+                                    [tip]="'The entire network may have more than' + resultsService.MAX_NODES + ' nodes. To see it, download the CSV files.'">
+                                </tt-popup>
+                            </div>
+                            <mat-slider class="radio-group" [max]="resultsService.itemsCount" [min]="0"
+                                [(ngModel)]="maxItems" (ngModelChange)="onChangeMaxItems()" [thumbLabel]="true">
+                            </mat-slider>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="param-c">
+                    <p>Edge parameters</p>
+                    <div style="display: flex; flex-wrap: wrap; flex: 1; flex-direction: column;">
+                        <div class="c-slider">
+                            <div class="r-slider">
+                                <p>Min weight: <b>{{minWeight / 100.0}}</b></p>
+                                <tt-popup [text]="''"
+                                    [tip]="'Minimum weight frequency filter. A greater edge weight means it appears more frequently in the input query. Setting the value to 0 disables the filter.'">
+                                </tt-popup>
+                            </div>
+                            <mat-slider class="radio-group" [max]="100" [min]="0" [(ngModel)]="minWeight"
+                                (ngModelChange)="onChangeMinWeight()" [thumbLabel]="true">
+                            </mat-slider>
+                        </div>
+                        <div class="c-slider">
+                            <div class="r-slider">
+                                <p>Bio coherence: <b>{{bioCoherence / 100.0}}</b></p>
+                                <tt-popup [text]="''"
+                                    [tip]="'Biological relevance of the edge. A higher value correlates with the biological relevance of the edge annotation (i.e., upregulates, interacts, affects, etc.). Setting the value to 0 disables the filter.'">
+                                </tt-popup>
+                            </div>
+                            <mat-slider class="radio-group" [max]="100" [min]="0" [(ngModel)]="bioCoherence"
+                                (ngModelChange)="onChangeBioCoherence()" [thumbLabel]="true">
+                            </mat-slider>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-container" style="margin: 0 5px">
+                <p class="p-header">Categories (click to hide)</p>
+                <div class="picker">
+                    <category-picker [categories]="resultsService.categories"
+                        (onToggleViewClicked)="onToggleCategory($event)"></category-picker>
+                </div>
+            </div>
+            <div class="filter-container" style="margin: 0 5px">
+                <p class="p-header">Nodes</p>
+                <search-table [items]="resultsService.annotationsItems"
+                    [tableColumns]="resultsService.annotationsTableColumns" [hasAction]="true" [class]="'small'"
+                    [hasOptions]="false" [showFocus]="true" (onToggleViewClicked)="onToggleViewClicked($event)"
+                    (onFocusViewClicked)="onFocusViewClicked($event)">
+                </search-table>
+            </div>
+        </mat-card>
+        <div class="r-center">
+            <mat-card style="padding: 16px;" *ngIf="(resultsService.information | async)" class="mat-elevation-z3">
+                <p>
+                    <span style="font-weight: 500;">Search description: </span><span>{{ (resultsService.information |
+                        async)['description']
+                        }}</span>
+                    <span> - <span style="font-weight: 500;">Created on: </span><span>{{ (resultsService.information |
+                            async)['created'] }}</span>
+                    </span>
+                </p>
+            </mat-card>
+
+            <div style="display: flex; flex-direction: column;">
+                <message-info *ngFor="let cm of configMessages" [configMessage]="cm"></message-info>
+            </div>
+            <!-- <message-info [severity]="'warning'"
+                [message]="'Notice that few nodes may contain noise (you may switch off them).'">
+            </message-info> -->
+
+            <div style="height: 640px;" #graph></div>
+
+            <div class="cyto-btns">
+                <mat-form-field>
+                    <mat-label>Graph Layout</mat-label>
+                    <mat-select [(ngModel)]="currentLayout" (selectionChange)="changeLayout($event.value)">
+                        <mat-option *ngFor="let l of layouts" [value]="l.value">{{l.name}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button mat-icon-button color="primary" (click)="resetZoom()">
+                    <div class="m-icon" style="background-image: url(../../assets/img/move.svg); margin: auto;"></div>
+                </button>
+            </div>
+
+            <div class="graph-util-container">
+                <button mat-raised-button color="primary" (click)="downloadSvg()">
+                    <mat-icon>insert_chart</mat-icon>
+                    Download Graph
+                </button>
+                <button mat-raised-button color="primary" (click)="downloadJSON()">
+                    <mat-icon>book</mat-icon>
+                    Download Sentences
+                </button>
+                <button mat-raised-button color="primary" (click)="downloadCsv()">
+                    <mat-icon>insert_drive_file</mat-icon>
+                    Download CSV
+                </button>
+            </div>
+
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>Search data</mat-panel-title>
+                        <mat-panel-description>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div *ngIf="resultsService.search">
+                        <div *ngIf="resultsService.search.pdf">
+                            <b>PDF</b>
+                            <div class="search-c">
+                                <p>{{resultsService.search.pdf}}</p>
+                            </div>
+                        </div>
+
+                        <div *ngIf="resultsService.search.pubmed_sort">
+                            <b>PUBMED</b>
+                            <div class="search-c">
+                                <span *ngIf="resultsService.search.pubmed_terms"><b>Terms:</b> {{
+                                    resultsService.search.pubmed_terms }}</span>
+                                <span><b>Max number of articles:</b> {{ resultsService.search.pubmed_retmax }}</span>
+                                <span><b>Sorted by:</b> {{ resultsService.search.pubmed_sort }}</span>
+                                <span *ngIf="resultsService.search.pubmed_id"><b>Id list:</b> {{
+                                    resultsService.search.pubmed_id }}</span>
+                            </div>
+                        </div>
+
+                        <div *ngIf="resultsService.search.pmc_sort">
+                            <b>PUBMED CENTRAL</b>
+                            <div class="search-c">
+                                <span *ngIf="resultsService.search.pmc_terms"><b>Terms:</b> {{
+                                    resultsService.search.pmc_terms }}</span>
+                                <span><b>Max number of articles:</b> {{ resultsService.search.pmc_retmax }}</span>
+                                <span><b>Sorted by:</b> {{ resultsService.search.pmc_sort }}</span>
+                                <span *ngIf="resultsService.search.pmc_id"><b>Id list:</b> {{
+                                    resultsService.search.pmc_id
+                                    }}</span>
+
+                            </div>
+                        </div>
+
+                        <div *ngIf="resultsService.search.freetext">
+                            <b>FREETEXT</b>
+                            <p class="search-c">{{resultsService.search.freetext}}</p>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>Extracted articles</mat-panel-title>
+                        <mat-panel-description>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div>
+                        <search-table [items]="resultsService.articlesItems"
+                            [tableColumns]="resultsService.articlesTableColumns"
+                            [tableColumnsNames]="resultsService.articlesTableColumnsNames" [linkIndex]="0" [idIndex]="0"
+                            (onLinkClicked)="linkClicked($event, '0')">
+                        </search-table>
+                    </div>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>Network nodes</mat-panel-title>
+                        <mat-panel-description>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div>
+                        <search-table [items]="resultsService.nodesSpots"
+                            [tableColumns]="resultsService.nodesTableColumns">
+                        </search-table>
+                    </div>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>Network edges</mat-panel-title>
+                        <mat-panel-description>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div>
+                        <search-table [items]="resultsService.edgesItems"
+                            [tableColumns]="resultsService.edgesTableColumns" [linkIndex]="1" [idIndex]="7"
+                            (onLinkClicked)="linkClicked($event, '1')">
+                        </search-table>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+        <mat-card class="mat-elevation-z3 r-right" style="padding: 0 !important;">
+            <div class="selector">
+                <mat-accordion [@.disabled]="disableAnimation">
+                    <mat-expansion-panel #panelAnalysis>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>Network analysis</mat-panel-title>
+                            <mat-panel-description>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <div class="card-dx-content">
+                            <ng-container *ngTemplateOutlet="analysis"></ng-container>
+                        </div>
+                    </mat-expansion-panel>
+
+                    <mat-expansion-panel #panelDetails>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>Node/Edge details</mat-panel-title>
+                            <mat-panel-description>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <div class="card-dx-content">
+                            <ng-container *ngTemplateOutlet="details"></ng-container>
+                        </div>
+                    </mat-expansion-panel>
+
+                    <mat-expansion-panel #panelTutorial>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>Tutorial</mat-panel-title>
+                            <mat-panel-description>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <div class="card-dx-content">
+                            <ng-container *ngTemplateOutlet="tutorial"></ng-container>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+        </mat-card>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" *ngIf="loading" [@fadeIn]>
+        <mat-progress-spinner style="margin: auto;" [color]="'primary'" [mode]="'indeterminate'" [diameter]="60">
+        </mat-progress-spinner>
+    </div>
+
+    <!-- CONSOLE -->
+    <console *ngIf="console" [id]="id" [resultReady]="resultReady" (onClick)="viewResult()" [@fadeIn]></console>
+
+    <!-- ERROR -->
+    <error-page *ngIf="error" [errorTitle]="errorMessage1" [errorMessage]="errorMessage2" [@fadeIn]></error-page>
+</div>
+
+
+
+
+
+<ng-template #details>
+    <div *ngIf="detailInfo === 'empty'" class="select-node" [@fadeIn]>
+        <p>Select a node or edge.</p>
+    </div>
+
+    <div *ngIf="detailInfo === 'node'" class="table-node" [@fadeIn]>
+        <table mat-table #dataSort='matSort' [dataSource]="dataSourceNode" matSort class="small">
+            <ng-container matColumnDef="edge">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Edge</th>
+                <td mat-cell *matCellDef="let element">
+                    <span style="display: flex; align-items: center;">{{element.edge}}
+                        <div class="m-icon"
+                            [ngStyle]="{ 'background-image': 'url(../../assets/img/' + (element.source ? 'arrow-left' : 'arrow-right' ) + '.svg)' }">
+                        </div>
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="nodes">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Nodes</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.target}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="articles">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Articles</th>
+                <td mat-cell *matCellDef="let element">
+                    <div style="display: flex; flex-wrap: wrap;">
+                        <a *ngFor="let l of element.articles" (click)="clickNodeLink(l, element)" style="margin: 0 2px;"
+                            href="javascript:void(0)">{{l}}</a>
+                    </div>
+
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="tableColumnsNode"></tr>
+            <tr mat-row *matRowDef="let row; columns: tableColumnsNode;"
+                [ngStyle]="{'background-color': row.bio > 0.2 ? '#a9e8cd':'#f88f8c' }">
+            </tr>
+        </table>
+
+    </div>
+
+    <div *ngIf="detailInfo === 'edge'" class="table-node" [@fadeIn]>
+        <table mat-table #dataSort='matSort' [dataSource]="dataSourceEdge" matSort class="small">
+            <ng-container matColumnDef="edge">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Edge</th>
+                <td mat-cell *matCellDef="let element">
+                    <a (click)="clickEdgeLink(element)" href="javascript:void(0)">{{element.edge}}</a>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="weight">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Weight</th>
+                <td mat-cell *matCellDef="let element">
+                    {{parseFixed(element.weight, 4)}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="bio">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Bio</th>
+                <td mat-cell *matCellDef="let element">
+                    {{parseFixed(element.bio, 4)}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="articles">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Articles</th>
+                <td mat-cell *matCellDef="let element">
+                    <a *ngFor="let l of element.articles" (click)="linkClicked(l, '0')"
+                        href="javascript:void(0)">{{l}}</a>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="tableColumnsEdge"></tr>
+            <tr mat-row *matRowDef="let row; columns: tableColumnsEdge;"
+                [ngStyle]="{'background-color': resultsService.numberToColorHsl(1-row.bio) }">
+            </tr>
+        </table>
+
+    </div>
+</ng-template>
+
+<ng-template #analysis>
+    <mat-tab-group (selectedTabChange)="clearAnalysis(); selectedAnalysisTab = $event.index" animationDuration="0ms">
+        <mat-tab *ngFor="let item of resultsService.analysisOptions" [label]="item.label"></mat-tab>
+    </mat-tab-group>
+
+    <div class="an-tab">
+        <mat-form-field style="margin-top: 7px;">
+            <mat-label>{{resultsService.analysisOptions[selectedAnalysisTab].selectLabel}}</mat-label>
+            <mat-select #sel (selectionChange)="clearResult($event.value)">
+                <mat-option *ngFor="let opt of resultsService.analysisOptions[selectedAnalysisTab].options"
+                    [value]="opt.value">
+                    {{opt.label}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <ng-container *ngIf="selectedAnalysisOpt?.hasSource">
+            <ng-container *ngTemplateOutlet="analysisNodeSearchSource"></ng-container>
+        </ng-container>
+
+        <ng-container *ngIf="selectedAnalysisOpt?.hasTarget">
+            <ng-container *ngTemplateOutlet="analysisNodeSearchTarget"></ng-container>
+        </ng-container>
+
+        <ng-container *ngIf="selectedAnalysisOpt?.hasTable">
+            <div class="filter-container" style="margin: 0 5px">
+                <search-table [items]="analysisItems" [tableColumns]="getAnalysisTableColumns()"
+                    [colorIndex]="selectedAnalysisTab === 3 ? 1 : -1" [hasAction]="false" [class]="'small'"
+                    [showNoData]="false" [hasOptions]="false">
+                </search-table>
+            </div>
+
+            <button mat-raised-button color="primary" style="margin: 10px 0px 0px auto;"
+                [disabled]="!selectedAnalysisOpt || (analysisItems | async)?.length === 0"
+                (click)="exportAnalysisTable()">
+                <mat-icon>insert_drive_file</mat-icon>
+                Export CSV
+            </button>
+
+        </ng-container>
+
+        <button style="margin-top: 30px;" mat-raised-button color="primary" [disabled]="!selectedAnalysisOpt || (selectedAnalysisOpt.hasSource && !analysisRoot.sourceNode) || (selectedAnalysisOpt.hasTarget && !analysisRoot.targetNode) ||
+            (selectedAnalysisOpt.hasTable && (analysisItems | async)!.length > 0)"
+            (click)="startAnalysisAlgo()">START</button>
+    </div>
+
+    <!-- <message-info [severity]="'info'" [message]="analysisMessage">
+    </message-info> -->
+</ng-template>
+
+<ng-template #tutorial>
+    <a href="https://www.youtube.com/watch?v=7Qnrd_G3yVc" target="_blank">
+        <div class="link-preview">
+            <img src="../../../assets/img/tutorial/preview.jpeg">
+            <p>NetME English Tutorial</p>
+            <p>Youtube</p>
+        </div>
+    </a>
+</ng-template>
+
+<ng-template #analysisNodeSearchSource>
+    <select-from-api [apiObservable]="resultsService.nodesItems" [keyLocale]="'word'" [keyOutput]="'word'"
+        [infoKeys]="[]" [multiple]="false" [label]="'Select root node'" (onSelection)="setAnalysisNode($event, true)">
+    </select-from-api>
+</ng-template>
+
+<ng-template #analysisNodeSearchTarget>
+    <select-from-api [apiObservable]="resultsService.nodesItems" [keyLocale]="'word'" [keyOutput]="'word'"
+        [infoKeys]="[]" [multiple]="false" [label]="'Select target node'" (onSelection)="setAnalysisNode($event, false)"
+        style="margin-top: 0;">
+    </select-from-api>
+</ng-template>

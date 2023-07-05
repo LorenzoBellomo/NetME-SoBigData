@@ -1,0 +1,16 @@
+FROM mongo:latest
+
+COPY ./netservice/init_mongo.js /docker-entrypoint-initdb.d/
+
+RUN apt-get update && \
+    apt-get install -y \
+    python3.8 \
+    python3-pip \
+    git \
+    screen \
+    nano && \
+    pip3 install lxml && \
+    pip3 install six && \
+    pip3 install pymongo && \
+    pip3 install requests && \
+    pip3 install progressbar2

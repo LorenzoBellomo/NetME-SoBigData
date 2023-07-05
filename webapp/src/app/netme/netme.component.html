@@ -1,0 +1,134 @@
+<div class="container p-4 netme page cc-mh">
+    <div class="mh-600" *ngIf="!searching && !error">
+        <!-- <message-info [severity]="'warning'" [message]="'New network building engine will be available soon.'">
+        </message-info> -->
+
+        <div style="display: flex; flex-direction: column;">
+            <message-info *ngFor="let cm of configMessages" [configMessage]="cm"></message-info>
+        </div>
+
+        <div class="n-tabs">
+            <div class="tab" (click)="onTabChanged(0)" [class.active]="searchTab === 'pubmed'">
+                <div class="icon" style="background-image: url(../../assets/img/database.png);"></div>
+                <tt-popup [text]="'Pubmed'" [tip]="'Pubmed query-based network annotation'">
+                </tt-popup>
+                <div class="highlight"></div>
+            </div>
+            <div class="tab" (click)="onTabChanged(1)" [class.active]="searchTab === 'text'">
+                <div class="icon" style="background-image: url(../../assets/img/txt-file.png);"></div>
+                <tt-popup [text]="'TEXT input'" [tip]="'User-provided free-text network annotation'">
+                </tt-popup>
+                <div class="highlight"></div>
+            </div>
+            <div class="tab" (click)="onTabChanged(2)" [class.active]="searchTab === 'pdf'">
+                <div class="icon" style="background-image: url(../../assets/img/pdf-file.png);"></div>
+                <tt-popup [text]="'PDF files'" [tip]="'User-provided PDF documents network annotation'">
+                </tt-popup>
+                <div class="highlight"></div>
+            </div>
+        </div>
+        <mat-divider style="margin-top: -10px;"></mat-divider>
+
+        <div class="tab-div" *ngIf="searchTab === 'pubmed'">
+            <tt-popup [text]="'Query parameters'" [tip]="'The query for the search engine'"></tt-popup>
+            <mat-form-field appearance="outline" floatLabel="never">
+                <input matInput placeholder="Example - PTEN AND SRC OR RPE" [(ngModel)]="pubmedInput"
+                    autocomplete="off">
+            </mat-form-field>
+
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Advanced search
+                        </mat-panel-title>
+                        <mat-panel-description>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div style="display: flex; flex-wrap: wrap;">
+                        <div class="search-c">
+                            <div style="display: flex; flex-direction: column; flex: 1; min-width: 190px">
+                                <tt-popup [text]="'Search on'"
+                                    [tip]="'Select database from which netme extracts the reference literature'">
+                                </tt-popup>
+                                <mat-radio-group class="radio-group" [(ngModel)]="searchOpt">
+                                    <mat-radio-button *ngFor="let x of searchOpts" [value]="x.value">
+                                        {{x.title}}
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                            <div style="display: flex; flex-direction: column; flex: 1; min-width: 190px">
+                                <tt-popup [text]="'Search type'"
+                                    [tip]="'Choose whether to search the database from a search query or from a list of paper ids'">
+                                </tt-popup>
+                                <mat-radio-group class="radio-group" [(ngModel)]="searchTypeOpt">
+                                    <mat-radio-button *ngFor="let x of searchTypesOpts" [value]="x.value">
+                                        {{x.title}}
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </div>
+                        <div class="search-c">
+                            <div style="display: flex; flex-direction: column; flex: 1; min-width: 190px">
+                                <tt-popup [text]="'Papers to extract'"
+                                    [tip]="'The number of papers that will be analyzed to create the network'">
+                                </tt-popup>
+                                <mat-select [(ngModel)]="paperOpt" style="margin-top: 20px;">
+                                    <mat-option *ngFor="let x of papersOpts" [value]="x.value">
+                                        {{x.title}}
+                                    </mat-option>
+                                </mat-select>
+                            </div>
+                            <div style="display: flex; flex-direction: column; flex: 1; min-width: 190px">
+                                <tt-popup [text]="'Sort by'"
+                                    [tip]="'Specifies the sort order for the resulting list of papers'">
+                                </tt-popup>
+                                <mat-select [(ngModel)]="sortOpt" style="margin-top: 20px;">
+                                    <mat-option *ngFor="let x of sortOpts" [value]="x.value">
+                                        {{x.title}}
+                                    </mat-option>
+                                </mat-select>
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+
+        <div class="tab-div" *ngIf="searchTab === 'text'">
+            <mat-form-field appearance="outline">
+                <mat-label>Input free text</mat-label>
+                <textarea matInput placeholder="Example - PTEN AND SRC OR RPE..." [(ngModel)]="freeTextInput"
+                    autocomplete="off"></textarea>
+            </mat-form-field>
+        </div>
+
+        <div class="tab-div" *ngIf="searchTab === 'pdf'">
+            <p>Select one or more pdf files (files larger than 8MB will be discarded)</p>
+            <file-upload [multiple]="true" (onFileSelectedEmitter)="fileChange($event)"
+                (onFileRemovedEmitter)="fileRemoved($event)" [chooseLabel]="'Load file'"></file-upload>
+        </div>
+
+        <div style="display: flex; flex-direction: column; margin: 20px;">
+            <div>
+                <p style="margin-bottom: 0;">Name your network</p>
+                <mat-form-field appearance="outline" floatLabel="never" style="width: 100%;">
+                    <input matInput [placeholder]="networkName" [(ngModel)]="userNetworkName" autocomplete="off">
+                </mat-form-field>
+            </div>
+            <button mat-raised-button color="primary" (click)="startSearch()"
+                [disabled]="(searchTab === 'pubmed' && !pubmedInput) || (searchTab === 'text' && !freeTextInput) || (searchTab === 'pdf' && 1 > files.length)">Start
+                search</button>
+        </div>
+    </div>
+
+    <error-page *ngIf="!searching && error" [errorTitle]="errorMessage1" [errorMessage]="errorMessage2" [linkBack]="''"
+        (clickGoBack)="initPage()">
+    </error-page>
+
+    <div class="mh-600 flex-center" *ngIf="searching">
+        <mat-progress-spinner style="margin: auto;" [color]="'primary'" [mode]="'indeterminate'" [diameter]="60">
+        </mat-progress-spinner>
+    </div>
+
+</div>

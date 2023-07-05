@@ -1,0 +1,10 @@
+{
+    "apikey"   : "9fa42ec62c582485fb7e6c69148eaf940308",
+    "redis_ip" : "172.39.0.10",
+    "onto_pmd" : "",
+    "onto_pmc" : "http://131.114.50.197:8882/annotate_by_id",
+    "onto_pdf" : "http://131.114.50.197:8882/annotate_sections",
+    "onto_lst" : "http://131.114.50.197:8882/annotate_netme_idlist",
+    "onto_text": "http://131.114.50.197:8882/annotate_by_text",
+    "onto_log" : "http://131.114.50.197:8882/get_progress_log?token={token}"
+}

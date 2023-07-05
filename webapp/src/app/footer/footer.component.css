@@ -1,0 +1,32 @@
+a {
+    font-size: 13px;
+    /* color: #333; */
+    font-weight: 500;
+}
+.f-container {
+    background-color: #eee;
+    min-height: 213px;
+    display: flex;
+    max-width: 100%;
+    padding: 20px;
+}
+
+.f-row {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.f-dep-container {
+    flex: 1 0;
+}
+
+.f-dep-content {
+    display: flex;
+}
+
+@media only screen and (min-width: 950px) and (orientation: landscape){
+    .f-row {
+        flex-direction: row;
+    }
+}

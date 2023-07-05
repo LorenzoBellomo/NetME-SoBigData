@@ -1,0 +1,12 @@
+{
+    "host": "172.39.0.4",
+	"port": 27017,
+	"db": "netmedb",
+	"collections": [
+	   "dumps",
+	   "annotations",
+	   "requests"
+	],
+	"username": "netme",
+	"password": "netme"
+}

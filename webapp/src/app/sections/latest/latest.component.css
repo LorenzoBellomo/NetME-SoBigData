@@ -1,0 +1,24 @@
+.container {
+    padding: 0;
+}
+
+table {
+    margin: 0px;
+    width: 100%;
+    /* table-layout: fixed; */
+}
+
+.name {
+    padding-right: 20px !important;
+}
+
+@media only screen and (min-width: 950px) and (orientation: landscape) {
+    .container {
+        padding: 20px 15px 15px 15px;
+    }
+    
+    table {
+        margin: 0 16px;
+        width: 100%;
+    }
+}

@@ -1,0 +1,18 @@
+<mat-form-field>
+    <mat-label [ngStyle]="{'opacity': disabled ? '0.5' : '1' }">{{label}}</mat-label>
+    <mat-select [formControl]="itemsMultiSelectFormCtrl" placeholder="Items" [multiple]="multiple" [required]="required"
+        #multiSelect [disabled]="disabled" (selectionChange)="onSelect($event.value)">
+        <mat-option>
+            <ngx-mat-select-search [formControl]="multiFilterFormCtrl" placeholderLabel="Cerca...">
+            </ngx-mat-select-search>
+        </mat-option>
+        <mat-option *ngFor="let item of filteredItems$ | async" [value]="item">
+            <span>{{item[keyLocale] === '*'? 'Seleziona tutto' : item[keyLocale]+' '}}</span>
+            <div>
+                <ng-container *ngFor="let key of infoKeys"><span class="info">{{item[key] + ' '}}</span></ng-container>
+            </div>
+        </mat-option>
+    </mat-select>
+
+
+</mat-form-field>

@@ -1,0 +1,46 @@
+.nav-link {
+    margin-left: 15px;
+    margin-right: 1px;
+    vertical-align: middle;
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    position: relative;
+    overflow: hidden;
+}
+
+.active:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 51%;
+    right: 51%;
+    bottom: 0;
+    background-color: #145689;
+    height: 4px;
+    border-radius: 4px;
+}
+
+.active, .active:before {
+    visibility: visible;
+    -webkit-transform: scaleX(1);
+    transform: scaleX(1);
+    left: 0; 
+    right: 0;
+}
+
+.nav-link:hover:before,
+.nav-link:focus:before,
+.nav-link:active:before {
+    left: 0;
+    right: 0;
+} 
+
+
+
+.nav-link-m, .nav-link-m:hover {
+    font-size: 14px !important;
+   padding: 5px;
+   font-weight: 500;
+   text-decoration: none;
+}
+

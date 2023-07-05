@@ -1,0 +1,18 @@
+<div>
+    <button mat-raised-button color="primary" (click)="onClick($event)" [disabled]="disabled">
+        <mat-icon>add</mat-icon>
+        {{chooseLabel}}
+    </button>
+    <input #fileUpload type="file" class="input_fileupload--hidden" (input)="onInput($event)"
+        (change)="onFileSelected($event)" accept="application/pdf" ngDefaultControl>
+
+    <div *ngFor="let f of files" style="display: flex;
+    align-items: center;
+    font-size: 12px;">
+        <span>{{f.name}}</span>
+        <button mat-icon-button color="primary" [attr.title]="deleteButtonLabel?deleteButtonLabel:null"
+            (click)="removeFile($event,f)">
+            <mat-icon>{{deleteButtonIcon}}</mat-icon>
+        </button>
+    </div>
+</div>

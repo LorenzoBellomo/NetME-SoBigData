@@ -1,0 +1,25 @@
+
+:host {
+    width: 100%;
+    mat-form-field {
+        width: 100%;
+    }
+}
+.mat-option{
+    font-size: inherit;
+    line-height: 1.5em !important;
+    height: 4em !important;
+}
+.mat-select-panel{
+    font-size: inherit;
+    line-height: 1.5em !important;
+    height: 4em !important;
+}
+.info{
+    color: darkgray;
+}
+.mat-select-search-no-entries-found{
+    //display: none;
+    //visibility: hidden;
+    color: transparent !important;
+}

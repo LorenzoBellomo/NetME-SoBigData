@@ -1,0 +1,123 @@
+version: "3.7"
+
+networks:
+  internal:
+    external: true # TODO: it should be false
+  proxy:
+    external: true
+
+services:
+  redis:
+    image: 'netme_redis'
+    container_name: 'netme_redis'
+    build:
+      context: "."
+      dockerfile: ./netservice/Dockerfile.redis
+    labels:
+      - traefik.enable=false
+    networks:
+      internal:
+        ipv4_address: 172.39.0.10
+
+  traefik:
+    command:
+      - "--entrypoints.http.address=:80"
+      - "--providers.docker=true"
+      - "--api=true"
+    image: "traefik:2.4.8"
+    labels:
+      - "traefik.http.routers.traefik.rule=HostRegexp(`traefik.{host:.+}`)"
+      - traefik.http.routers.traefik.entrypoints=http
+      - traefik.http.routers.traefik.middlewares=auth
+      - traefik.http.routers.traefik.service=api@internal
+      - "traefik.http.routers.traefik.tls=${TLS}"
+      - "traefik.http.routers.traefik.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD_HASH}"
+    networks:
+      - internal
+      - proxy
+    ports:
+      - "8076:80"
+    volumes:
+      - "./data/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  webapp:
+    build:
+      context: ./webapp/
+      dockerfile: ./Dockerfile
+      args:
+        - BUILD=${BUILD}
+    labels:
+      - "traefik.http.routers.webapp.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.webapp.tls=${TLS}"
+      - "traefik.http.routers.webapp.tls.certresolver=${CERT_RESOLVER}"
+      - traefik.port=80
+    networks:
+      internal:
+        ipv4_address: "172.39.0.3"
+
+  db_mongo:
+    build:
+      context: "."
+      dockerfile: ./netservice/Dockerfile.mongo
+    container_name: db_netme
+    environment:
+      MONGO_INITDB_DATABASE: netmedb
+      MONGO_INITDB_ROOT_PASSWORD: netme
+      MONGO_INITDB_ROOT_USERNAME: netme
+    image: mongo_netme
+    labels:
+      - traefik.enable=false
+    networks:
+      internal:
+        ipv4_address: "172.39.0.4"
+    ports:
+      - "47017-47019:27017-27019"
+    restart: always
+    volumes:
+      - "./netservice/volume_mongo:/data/db:rw"
+
+  fastapi:
+    build:
+      context: "."
+      dockerfile: ./netservice/Dockerfile.celery
+    entrypoint: "uvicorn app:app --host 172.39.0.8 --port 8091"
+    image: "celery:latest"
+    labels:
+      - "traefik.http.routers.fastapi.rule=HostRegexp(`api.{host:.+}`) && (PathPrefix(`/send_data`) || PathPrefix(`/items`) || PathPrefix(`/ws`))"
+      - "traefik.http.routers.fastapi.tls=${TLS}"
+      - "traefik.http.routers.fastapi.tls.certresolver=${CERT_RESOLVER}"
+      - traefik.port=8091
+    networks:
+      internal:
+        ipv4_address: "172.39.0.8"
+    ports:
+      - "8092:8091"
+    volumes:
+      - "./netservice/volume:/app:rw"
+
+  rabbit:
+    image: "rabbitmq:management"
+    labels:
+      - traefik.enable=false
+    networks:
+      internal:
+        ipv4_address: "172.39.0.7"
+
+  worker:
+    build:
+      context: "."
+      dockerfile: ./netservice/Dockerfile.celery
+    environment:
+      - CELERY_BROKER_URL=redis://172.39.0.10:6379/0
+      - CELERY_RESULT_BACKEND=redis://172.39.0.10:6379/0
+    entrypoint: "celery --app=worker_new.celery_app worker --concurrency=4 --autoscale=10,4 --loglevel=info"
+    image: "celery:latest"
+    labels:
+      - traefik.enable=false
+    networks:
+      internal:
+        ipv4_address: "172.39.0.9"
+    volumes:
+      - "./netservice/volume:/app:rw"

@@ -1,0 +1,45 @@
+# Ports listened by Traefik. You need to listen on port 80 and 443
+# In the case of an HTTP request, a redirection rule is used to forward it to the https entrypoint instead.
+[entryPoints]
+  [entryPoints.http]
+      address = ":80"
+      [entryPoints.http.http.redirections.entryPoint]
+          to = "https"
+          scheme = "https"
+
+  [entryPoints.https]
+      address = ":443"
+
+
+#[tls.options]
+#  [tls.options.default]
+#    minVersion = "VersionTLS12"
+#    maxVersion = "VersionTLS13"
+
+
+# "providers" section configures our network routes.
+# docker provider monitors the Docker containers running on your host.
+[providers]
+  [providers.docker]
+    watch   = true
+    network = "internal"
+
+
+# entryPoint used in the “http” blocks where we setup the route.
+[api]
+  dashboard  = true
+
+
+# ACME is the name of the protocol used to communicate with Let’s Encrypt to manage certificates.
+# Let’s Encrypt service requires registration with a valid email address
+# store the information that you will receive from Let’s Encrypt in a JSON file called acme.json
+[certificatesResolvers.lets-encrypt.acme]
+  email   = "antoniodm@unict.it"
+  storage = "/etc/traefik/acme.json"
+  [certificatesResolvers.lets-encrypt.acme.tlsChallenge]
+
+
+# dynamic configurations in another file, which you will call traefik_dynamic.toml.
+# you are using the file provider to tell Traefik that it should read in dynamic configurations from a different file.
+[providers.file]
+  filename = "/etc/traefik/traefik_dynamic.toml"

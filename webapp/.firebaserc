@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "netme-webapp": {
+      "hosting": {
+        "app": [
+          "netme-webapp"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "netme-webapp"
+  }
+}

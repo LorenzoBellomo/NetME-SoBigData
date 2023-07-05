@@ -1,0 +1,6 @@
+<div style="display: flex; flex-wrap: wrap; font-size: 11px;">
+    <div *ngFor="let c of categories; index as i" class="c-item" (click)="toggleView(i)"
+        [ngStyle]="{'background-color': c.show ? c.color : '#222' }">
+        <span class="c-item" [ngStyle]="{'color': getTextColor(c.color) }" [class.disactive]="!c.show">{{c.name}}</span>
+    </div>
+</div>

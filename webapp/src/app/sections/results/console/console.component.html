@@ -1,0 +1,41 @@
+<div class="container netme page">
+    <div *ngIf="!resultReady" class="content">
+        <p class="h-status hsd" style="margin-top: 0;">Network elaboration for ID <span>{{id}}</span> is in progress.
+        </p>
+        <div style="display: flex; flex-direction: column; margin: auto;">
+            <mat-progress-spinner style="margin: 20px auto;" [color]="'primary'" [mode]="'indeterminate'"
+                [diameter]="70">
+            </mat-progress-spinner>
+            <div class="pcontainer">
+                <div class="progress2 progress-moved">
+                    <div class="progress-bar2" [ngStyle]="{ 'width': percentageStr }">
+                    </div>
+                </div>
+                <div class="pb-text">
+                    <span>PROCESSING...</span>
+                    <span style="margin-left: auto;">{{percentageStr}}</span>
+                </div>
+            </div>
+        </div>
+        <mat-accordion [@.disabled]="disableAnimation">
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Progress details
+                    </mat-panel-title>
+                    <mat-panel-description>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div class="console-container">
+                    <div [innerHTML]="consoleMessage" #scrollMe (scroll)="onScroll()"></div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+
+    <div *ngIf="resultReady" class="content">
+        <div class="bg-done"></div>
+        <p class="h-status hsd">Network elaboration for ID <span>{{id}}</span> is completed!</p>
+        <button mat-raised-button color="primary" (click)="viewResult()" style="width: 120px;">View</button>
+    </div>
+</div>

@@ -1,0 +1,10 @@
+.tt-tooltip {
+    background-color: rgb(28, 32, 36); 
+    padding: 8px 16px;
+    border-radius: 4px; 
+    position: absolute;
+    z-index: 1000; 
+    color: rgb(249, 254, 255);
+    max-width: 280px;
+    text-align: center;
+}

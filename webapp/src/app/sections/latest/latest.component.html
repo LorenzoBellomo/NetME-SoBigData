@@ -1,0 +1,72 @@
+<div class="container p-4 netme page cc-mh">
+    <div class="container">
+        <ng-container *ngIf="latest.length > 0; else noData">
+            <table mat-table #dataSort='matSort' [dataSource]="dataSource" matSort>
+                <ng-container matColumnDef="searchId">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        Search ID
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="separator-margin"></div>
+                        <div class="name-content">
+                            <span class="name">
+                                <a [routerLink]="['/results', row.searchId]">{{ row.searchId }}</a>
+                            </span>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="generatedOn">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        Created on
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="separator-margin"></div>
+                        <div class="name-content">
+                            <span class="name">{{ row.generatedOn }}</span>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        Network Name
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="separator-margin"></div>
+                        <div class="name-content">
+                            <span class="name">{{ row.networkName }}</span>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="sources">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        Sources
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="separator-margin"></div>
+                        <div class="name-content">
+                            <span class="name">{{ row.sources }}</span>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="delete">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        Delete
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <button mat-button (click)="this.deleteNetwork(row.searchId)">
+                           <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: tableColumns;">
+                </tr>
+            </table>
+            <mat-paginator (page)="scrollToTop()" [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator>
+        </ng-container>
+
+        <ng-template #noData>
+            <div class="no-data">No data</div>
+        </ng-template>
+    </div>
+</div>

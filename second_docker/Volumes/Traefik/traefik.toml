@@ -1,0 +1,56 @@
+debug     = false
+logLevel  = "ERROR"
+
+
+# ENTRYPOINT DEFINITION
+# WE ARE REDIRECT ALL TRAFFIC OVER HTTPS PROTOCOL
+[entryPoints.web]
+    address = ":80"
+    [entryPoints.web.http]
+       [entryPoints.web.http.redirections]
+          [entryPoints.web.http.redirections.entryPoint]
+           to     = "websecure"
+           scheme = "https"
+
+
+# This section is about the default TLS configuration applied to all routers associated with the named entry point.
+[entryPoints.websecure]
+    address = ":443"
+    [entryPoints.websecure.http.tls]
+        certResolver = "lets-encrypt"
+
+
+
+# DASHBOARD ACTIVATION
+[api]
+    dashboard = true
+
+
+
+# Certificate resolvers request certificates for a set of the domain names inferred from routers.
+# logic:
+#  - If the router has a tls.domains option set, then the certificate resolver uses the main (and optionally sans)
+#    option of tls.domains to know the domain names for this router.
+#  - If no tls.domains option is set, then the certificate resolver uses the router's rule, by checking the Host()
+#    matchers. Please note that multiple Host() matchers can be used) for specifying multiple domain names for this router.
+[certificatesResolvers.lets-encrypt.acme]
+     email    = "antonio.dimaria1@unict.it"
+     storage  = "/etc/traefik/acme.json"
+     [certificatesResolvers.lets-encrypt.acme.tlsChallenge]
+
+
+
+# The docker provider enables Traefik to act as a proxy in front of Docker containers. You’ve configured the provider
+# to watch for new containers on the web network, which you’ll create soon.
+[providers.docker]
+     endpoint = "unix:///var/run/docker.sock"
+     watch   = true
+     network = "internal"
+
+
+
+# dynamic configurations in another file, which you will call traefik_dynamic.toml.
+# you are using the file provider to tell Traefik that it should read in dynamic configurations from a different file.
+[providers.file]
+     filename = "/etc/traefik/traefik_dynamic.toml"
+

@@ -1,0 +1,18 @@
+.c-item {
+    display: flex; 
+    align-items: center;
+    margin: 3px;
+    cursor: pointer;
+    border-radius: 16px;
+}
+
+.c-item span {
+    padding: 0px 7px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.disactive {
+    color: #222 !important;
+    background-color: rgb(241, 241, 241) !important;
+}

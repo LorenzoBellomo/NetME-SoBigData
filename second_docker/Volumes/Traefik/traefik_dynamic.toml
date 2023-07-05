@@ -1,0 +1,16 @@
+# TRAEFIK MONITOR ACTIVATION AND CONFIGURATION
+[http.routers.api]
+     rule        = "Host(`traefik.netme.adimaria.site`)"
+     service     = "api@internal"
+     entrypoints = ["websecure"]
+     middlewares = ["auth"]
+     [http.routers.api.tls]
+          certResolver = "lets-encrypt"
+
+
+# TRAEFIX DASHBOARD USERNAME AND PASSWORD.
+# PASSWORD: htpasswd -nbm <name> <password>
+[http.middlewares.auth.basicAuth]
+     users = [
+         "netme:$apr1$T32vuvNQ$I9a01ENUlnwNxnedeV33k."
+     ]

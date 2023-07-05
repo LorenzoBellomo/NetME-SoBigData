@@ -1,0 +1,6 @@
+<div style="display: flex; align-items: center;">
+    <span style="font-weight: 500;">{{text}}</span>
+    <div class="m-icon" style="background-image: url(../../assets/img/info.svg);" (mouseover)="isOver=true"
+        (mouseout)="isOver=false"></div>
+</div>
+<div *ngIf="isOver" class="tt-tooltip" [@fadeIn]>{{tip}}</div>

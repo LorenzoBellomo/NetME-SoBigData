@@ -1,0 +1,7 @@
+<h2 mat-dialog-title>Sentences list for label: <b>{{label}}</b></h2>
+<div mat-dialog-content>
+    <div [innerHTML]="innerHTML | safeHtml"></div>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="onOkClick()">OK</button>
+</div>

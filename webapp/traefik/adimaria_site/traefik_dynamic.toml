@@ -1,0 +1,17 @@
+# authentication for traefik dashboard
+[http.middlewares.dashboard_auth.basicAuth]
+  users = [
+    "antonio:$apr1$VPRrHjR0$qtsD2yOPKFDcw8SLUW4vJ0"
+  ]
+
+# To configure the router, you’ll use http.routers followed by the name of the router. api provides its own named router
+# that you can configure by using the [http.routers.api] section.
+# You’ll configure the domain that you plan on using with your dashboard also by setting the rule key using a host match,
+# the entrypoint to use websecure, and the middlewares to include simpleAuth.
+[http.routers.api]
+  rule           = "Host(`monitor.netme.adimaria.site`)"
+  entrypoints    = ["https"]
+  middlewares    = ["dashboard_auth"]
+  service        = "api@internal"
+  [http.routers.api.tls]
+     certResolver = "lets-encrypt"

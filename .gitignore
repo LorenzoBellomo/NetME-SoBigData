@@ -1,0 +1,13 @@
+netservice/*.pdf
+**/__pycache__
+**/netme.log
+**/files/dumps/*
+**/files/pdf/*
+**/volume/dumps/*
+**/volume/pdf/*
+docker-compose.yml
+.env
+netservice/volume/files/netme_worker.log
+netservice/volume_spacy/Ontologies/*
+second_netbuilder/Files/Dumps
+second_netbuilder/Files/Pdf

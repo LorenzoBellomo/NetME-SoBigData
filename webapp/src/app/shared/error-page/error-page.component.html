@@ -1,0 +1,7 @@
+<div class="error">
+    <p class="p1">{{errorTitle}}</p>
+    <p class="p2" [innerHTML]="errorMessage"></p>
+    <button mat-raised-button color="primary" [routerLink]="linkBack" (click)="onClickGoBack()">
+        <mat-icon>arrow_back</mat-icon>Go back
+    </button>
+</div>

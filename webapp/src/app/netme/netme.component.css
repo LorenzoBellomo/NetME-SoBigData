@@ -1,0 +1,73 @@
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+  }
+
+mat-select {
+    width: 90%;
+}
+
+.tab-div {
+    display: flex; flex-direction: column; margin: 20px;
+    min-height: 300px;
+}
+
+.n-tabs {
+    width: 100%; 
+    display: flex; 
+    justify-content: center; 
+}
+
+.n-tabs .tab {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 10px;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.n-tabs .icon {
+    width: 64px;
+    height: 64px;
+    margin: auto;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.n-tabs tt-popup {
+    margin-top: 10px;
+}
+
+.n-tabs .highlight {
+    height: 5px;
+    background-color: transparent;
+    border-radius: 5px;
+    width: 75%;
+    margin: 0 auto;
+    margin-top: 5px;
+}
+
+.active {
+    opacity: 1 !important;
+}
+
+.active .highlight {
+    background-color: #145689 !important;
+}
+
+.search-c {
+    display: flex; 
+    flex-wrap: wrap; 
+    flex: 1;
+}
+
+@media only screen and (min-width: 950px) and (orientation: landscape) {
+    .search-c {
+        min-width: 380px;
+    }
+}

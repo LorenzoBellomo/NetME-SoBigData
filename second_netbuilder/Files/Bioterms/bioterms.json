@@ -1,0 +1,32 @@
+{
+   "bioterms_list": [
+        "enhance",
+        "increase",
+        "induce",
+        "regulate",
+        "block",
+        "decrease",
+        "downregulate",
+        "affect",
+        "control",
+        "cause",
+        "contain",
+        "detect",
+        "display",
+        "find",
+        "reveal",
+        "upregulate",
+        "interact",
+        "activate",
+        "associate",
+        "express",
+        "release",
+        "trigger",
+        "produce",
+        "stimulate",
+        "reduce",
+        "ubiquitination",
+        "inactivate",
+        "overexpress"
+   ]
+}
